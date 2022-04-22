@@ -2,7 +2,7 @@
 
 ![](logo.jpg)
 
-<a><img src=" https://img.shields.io/badge/Python-3.9-blue "></a><a><img src=" https://img.shields.io/badge/pip-bleak-blue "></a><a><img src=" https://img.shields.io/badge/Tested on-Kali 2022.1-green "></a>
+<p align="center"><img src=" https://img.shields.io/badge/Python-3.9-blue "><img src=" https://img.shields.io/badge/pip-bleak-blue "><img src=" https://img.shields.io/badge/Tested on-Kali 2022.1-green "></p>
 
 写个小工具，我也不知道能写到什么程度Orz。
 
