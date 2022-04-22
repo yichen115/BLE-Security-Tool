@@ -2,6 +2,8 @@
 
 ![](logo.jpg)
 
+<a><img src=" https://img.shields.io/badge/Python-3.9-blue "></a><a><img src=" https://img.shields.io/badge/pip-bleak-blue "></a><a><img src=" https://img.shields.io/badge/Tested on-Kali 2022.1-green "></a>
+
 写个小工具，我也不知道能写到什么程度Orz。
 
 [可能因为bluez实现的某些问题](https://github.com/bluez/bluez/issues/219)，连接之后断开连接会报错。这时候可以重启一下蓝牙服务`service bluetooth restart`，然后拔插一下蓝牙适配器，这个问题完美的影响了工具运行的稳定性，会持续关注这个问题
