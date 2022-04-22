@@ -40,17 +40,25 @@ async def scan_characteristics(client,serviceid):
     CharS.align[green("属性")] = 'l'
     print(CharS)
 
-async def read_value(address,charuuid):
+async def read_value(client,charuuid):
     try:
-        value = bytes(await client.read_gatt_char(charuuid))
+        value = await client.read_gatt_char(charuuid)
         print(green("[+]RECV: ") + str(value))
     except:
         print(red("[x]ERROR: Can't read value from " + charuuid))
 
-async def write_value(address,charuuid,value):
+async def write_value_raw(client,charuuid,value):
     try:
-        await client.write_gatt_char(0x2b,bytes(value))
-        print(green("[+]SEND: ") + bytes(value))
+        value = bytes(bytearray.fromhex(value))
+        await client.write_gatt_char(charuuid,value)
+        print(green("[+]SEND RAW SUCCESS!"))
+    except:
+        print(red("[x]ERROR: Can't write value to " + charuuid))
+
+async def write_value_str(client,charuuid,value):
+    try:
+        await client.write_gatt_char(charuuid,value.encode())
+        print(green("[+]SEND STR SUCCESS!"))
     except:
         print(red("[x]ERROR: Can't write value to " + charuuid))
 
@@ -67,8 +75,10 @@ async def main():
     meun.add_row([yellow("lescan"),blue("扫描周围低功耗蓝牙设备")])
     meun.add_row([yellow("connect"),blue("连接BLE设备")])
     meun.add_row([yellow("disconnect"),blue("断开BLE设备的连接")])
-    meun.add_row([yellow("services"),blue("显示已连接设备的服务")])
-    meun.add_row([yellow("characteristics"),blue("显示某一服务的属性")])
+    meun.add_row([yellow("services"),blue("扫描已连接设备的所有服务")])
+    meun.add_row([yellow("characteristics"),blue("扫描某一服务的所有特性")])
+    meun.add_row([yellow("read"),blue("读取某一特性的值")])
+    meun.add_row([yellow("write"),blue("向某一特性写值")])
     meun.add_row([yellow("restart"),blue("重启蓝牙服务")])
     print(meun)
     choose = ""
@@ -89,6 +99,20 @@ async def main():
         if choose == "characteristics":
             serviceid = input("service uuid:")
             tmp = asyncio.create_task(scan_characteristics(client,serviceid))
+            await tmp
+        if choose == "read":
+            charuuid = input("characteristics uuid:")
+            tmp = asyncio.create_task(read_value(client,charuuid))
+            await tmp
+        if choose == "write":
+            charuuid = input("characteristics uuid:")
+            string = input("input:")
+            if string[:4] == "hex:":
+                value = string[4:]
+                tmp = asyncio.create_task(write_value_raw(client,charuuid,value))
+            else:
+                value = string
+                tmp = asyncio.create_task(write_value_str(client,charuuid,value))
             await tmp
         if choose == "clear":
             sys.stdout.write("\x1b[2J\x1b[H")
