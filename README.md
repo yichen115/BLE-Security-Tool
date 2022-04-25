@@ -1,4 +1,4 @@
-# BLE-Secutity-Tool
+# BLE-Security-Tool
 
 ![](logo.jpg)
 
