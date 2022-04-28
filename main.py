@@ -129,7 +129,7 @@ async def main():
         if choose == "write":
             char_uuid = input("characteristics uuid: ")
             string = input("input: ")
-            tmp = asyncio.create_task(write_value(client,char_uuid,value))
+            tmp = asyncio.create_task(write_value(client,char_uuid,string))
             await tmp
         if choose == "listen":
             char_uuid = input("characteristics uuid: ")
