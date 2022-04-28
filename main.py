@@ -134,7 +134,7 @@ async def main():
         if choose == "listen":
             char_uuid = input("characteristics uuid: ")
             time = input("listen time(default 3): ") or 3
-            value = input("input(default 'hello'): ") or b"hello"
+            value = input("input(default 'hello'): ") or "hello"
             tmp = asyncio.create_task(listen_notify(client,char_uuid,int(time),value))
             await tmp
         if choose == "clear":
