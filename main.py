@@ -45,7 +45,7 @@ async def read_value(client,char_uuid):
         value = await client.read_gatt_char(char_uuid)
         print(green("[+]RECV: ") + str(value))
     except:
-        print(red("[x]ERROR: Can't read value from " + char_uuid))
+        print(red("[x]ERROR: Can't read value from ") + str(char_uuid))
 
 async def write_value(client,char_uuid,string):
     if string[:4] == "hex:":
@@ -55,17 +55,17 @@ async def write_value(client,char_uuid,string):
             await client.write_gatt_char(char_uuid,value)
             print(green("[+]SEND RAW SUCCESS!"))
         except:
-            print(red("[x]ERROR: Can't write value to " + char_uuid))
+            print(red("[x]ERROR: Can't write value to ") + str(char_uuid))
     else:
         value = string
         try:
             await client.write_gatt_char(char_uuid,value.encode())
             print(green("[+]SEND STR SUCCESS!"))
         except:
-            print(red("[x]ERROR: Can't write value to " + char_uuid))
+            print(red("[x]ERROR: Can't write value to ") + str(char_uuid))
 
 def callback(sender: int, data: bytearray):
-    print(green(f"[+]RECV: {data}"))
+    print(green("[+]RECV: ") + f"{data}")
 
 async def listen_notify(client,char_uuid,time,value):
     await client.start_notify(char_uuid, callback)
@@ -110,33 +110,26 @@ async def main():
                 await scan_devices(adapter)
         if choose == "connect":
             address = input("MAC Address: ")
-            tmp = asyncio.create_task(connclient(address))
-            client = await tmp
+            client = await connclient(address)
         if choose == "disconnect":
-            tmp = asyncio.create_task(disconnclient(client))
-            await tmp
+            await disconnclient(client)
         if choose == "services":
-            tmp = asyncio.create_task(scan_services(client))
-            await tmp
+            await scan_services(client)
         if choose == "characteristics":
             serviceid = input("service uuid: ")
-            tmp = asyncio.create_task(scan_characteristics(client,serviceid))
-            await tmp
+            await scan_characteristics(client,serviceid)
         if choose == "read":
             char_uuid = input("characteristics uuid: ")
-            tmp = asyncio.create_task(read_value(client,char_uuid))
-            await tmp
+            await read_value(client,char_uuid)
         if choose == "write":
             char_uuid = input("characteristics uuid: ")
             string = input("input: ")
-            tmp = asyncio.create_task(write_value(client,char_uuid,string))
-            await tmp
+            await write_value(client,char_uuid,string)
         if choose == "listen":
             char_uuid = input("characteristics uuid: ")
             time = input("listen time(default 3): ") or 3
             value = input("input(default 'hello'): ") or "hello"
-            tmp = asyncio.create_task(listen_notify(client,char_uuid,int(time),value))
-            await tmp
+            await listen_notify(client,char_uuid,int(time),value)
         if choose == "clear":
             sys.stdout.write("\x1b[2J\x1b[H")
         if choose == "restart":
