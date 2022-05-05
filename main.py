@@ -6,8 +6,8 @@ from pyfiglet import Figlet
 
 ##################################################################
 
-async def connclient(address):
-    client = BleakClient(address)
+async def connclient(address,device):
+    client = BleakClient(address,adapter=device)
     await client.connect()
     return client
 
@@ -73,17 +73,26 @@ async def listen_notify(client,char_uuid,time,value):
     await asyncio.sleep(time)
     await client.stop_notify(char_uuid)
 
+def show_Adapters():
+    ap_address = os.popen("hciconfig | grep 'BD Address' | awk '{print $3}'").read().replace('\n', ';')[:-1].split(";")
+    device = os.popen("hciconfig | grep hci | awk '{print $1}'").read().replace(':\n', ';')[:-1].split(";")
+    Adapter = PrettyTable(["适配器", "地址"])
+    for i in range(0,len(ap_address)):
+        Adapter.add_row([yellow(device[i]),blue(ap_address[i])])
+    print(Adapter)
+
 ###############################################################
 
 async def main():
     f = Figlet(font="slant", width=100)
     print(f.renderText("BLE Security Tool"))
-    print(" Author: yichen               Version: 0.01\n")
+    print(" Author: yichen               Version: 0.02\n")
     meun = PrettyTable(["选项", "说明"])
     meun.align["选项"] = 'l'
     meun.align["说明"] = 'l'
     meun.add_row([yellow("help / h"),blue("展示帮助菜单")])
     meun.add_row([yellow("lescan"),blue("扫描周围低功耗蓝牙设备")])
+    meun.add_row([yellow("hciconfig"),blue("展示蓝牙适配器")])
     meun.add_row([yellow("connect"),blue("连接BLE设备")])
     meun.add_row([yellow("disconnect"),blue("断开BLE设备的连接")])
     meun.add_row([yellow("services"),blue("扫描已连接设备的所有服务")])
@@ -91,6 +100,7 @@ async def main():
     meun.add_row([yellow("read"),blue("读取某一特性的值")])
     meun.add_row([yellow("write"),blue("向某一特性写值")])
     meun.add_row([yellow("listen"),blue("监听某特征值的返回值")])
+    meun.add_row([yellow("bdaddr"),blue("修改MAC地址")])
     meun.add_row([yellow("restart"),blue("重启蓝牙服务")])
     print(meun)
     choose = ""
@@ -100,17 +110,19 @@ async def main():
             try:
                 await scan_devices("hci0")
             except:
-                address = os.popen("hciconfig | grep 'BD Address' | awk '{print $3}'").read().replace('\n', ';')[:-1].split(";")
-                device = os.popen("hciconfig | grep hci | awk '{print $1}'").read().replace(':\n', ';')[:-1].split(";")
-                Adapter = PrettyTable(["适配器", "地址"])
-                for i in range(0,len(address)):
-                    Adapter.add_row([yellow(device[i]),blue(address[i])])
-                print(Adapter)
+                show_Adapters()
                 adapter = input("Adapter: ")
                 await scan_devices(adapter)
+        if choose == "hciconfig":
+            show_Adapters()
         if choose == "connect":
             address = input("MAC Address: ")
-            client = await connclient(address)
+            try:
+                client = await connclient(address,"hci0")
+            except:
+                show_Adapters()
+                adapter = input("Adapter: ")
+                client = await connclient(address,adapter)
         if choose == "disconnect":
             await disconnclient(client)
         if choose == "services":
@@ -130,6 +142,13 @@ async def main():
             time = input("listen time(default 3): ") or 3
             value = input("input(default 'hello'): ") or "hello"
             await listen_notify(client,char_uuid,int(time),value)
+        if choose == "bdaddr":
+            print(red("需要在本目录make一下bdaddr"))
+            old_addr = input("now addr: ")
+            new_addr = input("new addr: ")
+            command = "./bdaddr -i " + old_addr + new_addr
+            result = os.popen(command).read()
+            print(result)
         if choose == "clear":
             sys.stdout.write("\x1b[2J\x1b[H")
         if choose == "restart":
