@@ -146,7 +146,7 @@ async def main():
             print(red("需要在本目录make一下bdaddr"))
             old_addr = input("now addr: ")
             new_addr = input("new addr: ")
-            command = "./bdaddr -i " + old_addr + new_addr
+            command = "./bdaddr -i " + old_addr + " " + new_addr
             result = os.popen(command).read()
             print(result)
         if choose == "clear":
