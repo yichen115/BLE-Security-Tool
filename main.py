@@ -3,6 +3,39 @@ from bleak import BleakScanner,BleakClient
 from color import *
 import sys,getopt,asyncio,os,readline
 from pyfiglet import Figlet
+from openpyxl import load_workbook
+
+##################################################################
+#处理表格,检索厂商信息
+file = "./CompanyIdentfiers.xlsx"   #filepath
+
+class ExcelUtils:
+    def __init__(self):
+        self.file = file
+        self.wb = load_workbook(self.file)
+        sheets = self.wb.get_sheet_names()
+        self.sheet = sheets[0]
+        self.ws = self.wb[self.sheet]
+
+    def get_rows(self):
+        rows = self.ws.max_row
+        return rows
+
+    def get_clos(self):
+        clo = self.ws.max_column
+        return clo
+
+    def get_cell_value(self, row, column):
+        cell_value = self.ws.cell(row=row, column=column).value
+        return cell_value
+
+excel_utils = ExcelUtils()
+excel_dict = {}
+row = excel_utils.get_rows()
+for i in range(1,row+1):
+    dict_key = excel_utils.get_cell_value(i, 1)
+    dict_value = excel_utils.get_cell_value(i, 2)
+    excel_dict[dict_key] = dict_value
 
 ##################################################################
 
@@ -16,9 +49,15 @@ async def disconnclient(client):
 
 async def scan_devices(device):
     devices = await BleakScanner.discover(adapter=device)
-    BLEdevices = PrettyTable([blue("编号"), yellow("设备地址"), green("设备名"), green("RSSI"), green("类型")])
+    BLEdevices = PrettyTable([blue("编号"), yellow("设备地址"), green("设备名"), green("RSSI"), green("类型"), green("厂商")])
+    BLEdevices.align[green("厂商")] = "l"
     for i in range(0,len(devices)):
-        BLEdevices.add_row([blue(str(i)), yellow(devices[i].address), green(devices[i].name),  green(str(devices[i].rssi)), green(str(devices[i].details["props"]["AddressType"]))])
+        try:
+            ManufacturerData = devices[i].details["props"]["ManufacturerData"].keys()
+            company = list(ManufacturerData)[0]
+            BLEdevices.add_row([blue(str(i)), yellow(devices[i].address), green(devices[i].name),  green(str(devices[i].rssi)), green(str(devices[i].details["props"]["AddressType"])), green(str(excel_dict[company]))])
+        except:
+            BLEdevices.add_row([blue(str(i)), yellow(devices[i].address), green(devices[i].name),  green(str(devices[i].rssi)), green(str(devices[i].details["props"]["AddressType"])), green("Unknow")])
     print(BLEdevices)
 
 async def scan_services(client):
@@ -86,7 +125,7 @@ def show_Adapters():
 async def main():
     f = Figlet(font="slant", width=100)
     print(f.renderText("BLE Security Tool"))
-    print(" Author: yichen               Version: 0.02\n")
+    print(" Author: yichen               Version: 0.03\n")
     meun = PrettyTable(["选项", "说明"])
     meun.align["选项"] = 'l'
     meun.align["说明"] = 'l'
