@@ -77,6 +77,7 @@ async def scan_characteristics(client,serviceid):
         else:
             pass
     CharS.align[green("属性")] = 'l'
+    CharS.sortby = yellow("句柄")
     print(CharS)
 
 async def read_value(client,char_uuid):
@@ -125,7 +126,7 @@ def show_Adapters():
 async def main():
     f = Figlet(font="slant", width=100)
     print(f.renderText("BLE Security Tool"))
-    print(" Author: yichen               Version: 0.03\n")
+    print(" Author: yichen               Version: 0.04\n")
     meun = PrettyTable(["选项", "说明"])
     meun.align["选项"] = 'l'
     meun.align["说明"] = 'l'
