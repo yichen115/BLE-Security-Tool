@@ -195,4 +195,7 @@ async def main():
         if choose == "h" or choose == "help":
             print(meun)
 
-asyncio.run(main())
+try:
+    asyncio.run(main())
+except:
+    asyncio.get_event_loop().run_until_complete(main())
