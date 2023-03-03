@@ -73,7 +73,7 @@ async def scan_characteristics(client,serviceid):
     for service in svcs:
         if service.uuid == serviceid:
             for char in service.characteristics:
-                CharS.add_row([blue(char.uuid),yellow(str(hex(char.handle))),green('; '.join(char.properties))])
+                CharS.add_row([blue(char.uuid),yellow(str(hex(int(char.handle)+1))),green('; '.join(char.properties))])
         else:
             pass
     CharS.align[green("属性")] = 'l'
@@ -139,7 +139,9 @@ async def main():
     meun.add_row([yellow("characteristics"),blue("扫描某一服务的所有特性")])
     meun.add_row([yellow("read"),blue("读取某一特性的值")])
     meun.add_row([yellow("write"),blue("向某一特性写值")])
-    meun.add_row([yellow("listen"),blue("监听某特征值的返回值")])
+    meun.add_row([yellow("listen"),blue("监听某特性值的返回值")])
+    meun.add_row([yellow("readddd"),blue("指定次数读取特性的值")])
+    meun.add_row([yellow("force"),blue("发送指定范围的值给某特性")])
     meun.add_row([yellow("bdaddr"),blue("修改MAC地址")])
     meun.add_row([yellow("restart"),blue("重启蓝牙服务")])
     print(meun)
@@ -189,6 +191,20 @@ async def main():
             command = "./bdaddr -i " + old_addr + " " + new_addr
             result = os.popen(command).read()
             print(result)
+        if choose == "readddd":
+            time_num = input("number of times: ")
+            char_uuid = input("characteristics uuid: ")
+            for i in range(0,int(time_num)):
+                await read_value(client,char_uuid)
+        if choose == "force":
+            start_num = int(input("start num: "))
+            stop_num = int(input("stop num: "))
+            char_uuid = input("characteristics uuid: ")
+            for i in range(start_num,stop_num):
+                x = str(hex(i))[2:]
+                x = x.zfill(2)
+                string = "hex:" + x
+                await write_value(client,char_uuid,string)
         if choose == "clear":
             sys.stdout.write("\x1b[2J\x1b[H")
         if choose == "restart":
