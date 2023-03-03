@@ -1,0 +1,4 @@
+bleak
+openpyxl
+prettytable
+pyfiglet

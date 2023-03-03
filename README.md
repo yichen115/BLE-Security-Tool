@@ -9,6 +9,8 @@
 
 也可能不是bluez的问题，之前用十几块钱的蓝牙适配器每次都会出现这个问题，现在换了个八十多的适配器没有遇到过这个问题了23333
 
+安装依赖：`python3 -m pip install -r requirements.txt`
+
 # 目前实现的功能
 
 - 查看本机的适配器：hciconfig
