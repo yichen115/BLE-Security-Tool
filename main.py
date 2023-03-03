@@ -126,7 +126,7 @@ def show_Adapters():
 async def main():
     f = Figlet(font="slant", width=100)
     print(f.renderText("BLE Security Tool"))
-    print(" Author: yichen               Version: 1.00\n")
+    print(" Author: yichen               Version: 1.02\n")
     meun = PrettyTable(["选项", "说明"])
     meun.align["选项"] = 'l'
     meun.align["说明"] = 'l'
