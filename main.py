@@ -69,15 +69,13 @@ async def scan_devices(device):
 
 async def scan_services(client):
     SvcS = PrettyTable([blue("服务UUID"), yellow("句柄")])
-    svcs = await client.get_services()
-    for service in svcs:
+    for service in client.services:
         SvcS.add_row([blue(service.uuid),yellow(str(hex(service.handle)))])
     print(SvcS)
 
 async def scan_characteristics(client,serviceid):
     CharS = PrettyTable([blue("特性UUID"), yellow("句柄"), green("属性")])
-    svcs = await client.get_services()
-    for service in svcs:
+    for service in client.services:
         if service.uuid == serviceid:
             for char in service.characteristics:
                 CharS.add_row([blue(char.uuid),yellow(str(hex(int(char.handle)+1))),green('; '.join(char.properties))])
