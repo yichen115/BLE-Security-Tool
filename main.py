@@ -13,7 +13,7 @@ class ExcelUtils:
     def __init__(self):
         self.file = file
         self.wb = load_workbook(self.file)
-        sheets = self.wb.get_sheet_names()
+        sheets = self.wb.sheetnames
         self.sheet = sheets[0]
         self.ws = self.wb[self.sheet]
 
