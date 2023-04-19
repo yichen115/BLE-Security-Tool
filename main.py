@@ -1,5 +1,5 @@
 from prettytable import PrettyTable
-from bleak import BleakScanner,BleakClient
+from bleak import BleakScanner,BleakClient,AdvertisementData,BLEDevice
 from color import *
 import sys,getopt,asyncio,os,readline
 from pyfiglet import Figlet
@@ -47,17 +47,24 @@ async def connclient(address,device):
 async def disconnclient(client):
     await client.disconnect()
 
+#扫描设备
 async def scan_devices(device):
-    devices = await BleakScanner.discover(adapter=device)
     BLEdevices = PrettyTable([blue("编号"), yellow("设备地址"), green("设备名"), green("RSSI"), green("类型"), green("厂商")])
     BLEdevices.align[green("厂商")] = "l"
-    for i in range(0,len(devices)):
+    devices = BleakScanner(adapter=device)
+    await devices.start()
+    await asyncio.sleep(5.0)
+    await devices.stop()
+    j=0
+    for i in devices.discovered_devices_and_advertisement_data:
+        j = j+1
+        device = devices.discovered_devices_and_advertisement_data[i][0]
+        advertisement_data = devices.discovered_devices_and_advertisement_data[i][1]
         try:
-            ManufacturerData = devices[i].details["props"]["ManufacturerData"].keys()
-            company = list(ManufacturerData)[0]
-            BLEdevices.add_row([blue(str(i)), yellow(devices[i].address), green(devices[i].name),  green(str(devices[i].rssi)), green(str(devices[i].details["props"]["AddressType"])), green(str(excel_dict[company]))])
+            company = list(advertisement_data.manufacturer_data)[0]
+            BLEdevices.add_row([blue(str(j)), yellow(device.address), green(device.name),  green(str(advertisement_data.rssi)), green(str(device.details["props"]["AddressType"])), green(str(excel_dict[company]))])
         except:
-            BLEdevices.add_row([blue(str(i)), yellow(devices[i].address), green(devices[i].name),  green(str(devices[i].rssi)), green(str(devices[i].details["props"]["AddressType"])), green("Unknow")])
+            BLEdevices.add_row([blue(str(j)), yellow(device.address), green(device.name),  green(str(advertisement_data.rssi)), green(str(device.details["props"]["AddressType"])), green("Unknow")]) 
     print(BLEdevices)
 
 async def scan_services(client):
